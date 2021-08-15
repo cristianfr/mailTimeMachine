@@ -1,0 +1,10 @@
+servers:
+  name:
+    host: some_host
+    port: some_port
+
+accounts:
+  server_name:
+    account_name:
+      login: some login
+      pass: some pass
