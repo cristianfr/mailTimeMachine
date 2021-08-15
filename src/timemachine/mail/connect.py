@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 
 class ImapConnect:
 
+    date_format = '%d-%b-%Y'
+    body_format = "(RFC822)"
+
     def __init__(self, server):
         logger.info("Connecting to server... %s", server.host)
         self.mail = imaplib.IMAP4_SSL(server.host)
@@ -18,3 +21,56 @@ class ImapConnect:
         logger.info("Authenticating... %s", account.login)
         self.mail.login(account.login, account.password)
         logger.info("Done")
+
+    def count(self):
+        status, cnt = self.mail.select()
+        return int(cnt[0])
+
+    def get_ids_between(self, sent_before, sent_since):
+        """
+        Select emails within a certain timezone independent time range.
+        Returns ids between those dates.
+        """
+        assert sent_since < sent_before
+        query = '(SENTBEFORE "{}" SENTSINCE "{}")'.format(
+            sent_before.strftime(self.date_format),
+            sent_since.strftime(self.date_format)
+        )
+        logger.debug(query)
+        result, data = self.mail.search(None, query)
+        return data[0].split()
+
+    def store_ids(self, id_list, mbox):
+        """
+        Fetch the message of the ids.
+        """
+        mbox.lock()
+        try:
+            for cnt, idx in enumerate(id_list):
+                status, data = self.mail.fetch(idx, self.body_format)
+                email = data[0][1]
+                mbox.add(email)
+        finally:
+            logger.info("Wrote to %s to mbox", cnt + 1)
+            mbox.flush()
+            mbox.unlock()
+
+    def store_ids_between(self, sent_before, sent_since, mbox, batch_size=10):
+        """
+        Store emails with batch size.
+        """
+        ids = self.get_ids_between(sent_before, sent_since)
+        logger.info(
+            "Found %s emails between %s and %s",
+            len(ids), sent_before, sent_since)
+        first = 0
+        batches_processed = 0
+        total_batches = len(ids)/batch_size + 1
+        while first < len(ids):
+            self.store_ids(ids[first:first + batch_size], mbox)
+            first = first + batch_size
+            batches_processed += 1
+            logger.info("{:.2f}% Done".format(
+                batches_processed * 100.0 /total_batches))
+        mbox.close()
+        logger.info("Done!")

@@ -1,3 +1,4 @@
+---
 servers:
   name:
     host: some_host
@@ -7,4 +8,4 @@ accounts:
   server_name:
     account_name:
       login: some login
-      pass: some pass
+      password: some pass
