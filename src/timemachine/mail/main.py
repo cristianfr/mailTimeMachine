@@ -1,6 +1,8 @@
-import timemachine.mail.connect as connect
-import timemachine.mail.config_parser as config_parser
-import timemachine.mail.models as models
+from timemachine.mail import (
+    config_parser,
+    connect,
+    models,
+)
 
 from datetime import datetime
 

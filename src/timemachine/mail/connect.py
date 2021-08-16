@@ -26,19 +26,26 @@ class ImapConnect:
         status, cnt = self.mail.select()
         return int(cnt[0])
 
+    def run_query(self, query):
+        result, data = self.mail.search(None, '({})'.format(query))
+        return data[0].split()
+
+    def fetch(self, idx):
+        status, data = self.mail.fetch(idx, self.body_format)
+        return data[0][1]
+
     def get_ids_between(self, sent_before, sent_since):
         """
         Select emails within a certain timezone independent time range.
         Returns ids between those dates.
         """
         assert sent_since < sent_before
-        query = '(SENTBEFORE "{}" SENTSINCE "{}")'.format(
+        query = 'SENTBEFORE "{}" SENTSINCE "{}"'.format(
             sent_before.strftime(self.date_format),
             sent_since.strftime(self.date_format)
         )
         logger.debug(query)
-        result, data = self.mail.search(None, query)
-        return data[0].split()
+        return self.run_query(query)
 
     def store_ids(self, id_list, mbox):
         """
@@ -47,9 +54,7 @@ class ImapConnect:
         mbox.lock()
         try:
             for cnt, idx in enumerate(id_list):
-                status, data = self.mail.fetch(idx, self.body_format)
-                email = data[0][1]
-                mbox.add(email)
+                mbox.add(self.fetch(idx))
         finally:
             logger.info("Wrote to %s to mbox", cnt + 1)
             mbox.flush()
@@ -62,7 +67,7 @@ class ImapConnect:
         ids = self.get_ids_between(sent_before, sent_since)
         logger.info(
             "Found %s emails between %s and %s",
-            len(ids), sent_before, sent_since)
+            len(ids), sent_since, sent_before)
         first = 0
         batches_processed = 0
         total_batches = len(ids)/batch_size + 1
