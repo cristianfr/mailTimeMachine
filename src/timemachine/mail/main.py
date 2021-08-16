@@ -14,7 +14,7 @@ import sys
 
 logging.basicConfig(
     level=logging.INFO,
-    format='[%(asctime)s] (%(name)s) - %(levelname)s - %(message)s') 
+    format='[%(asctime)s] (%(name)s) - %(levelname)s - %(message)s')
 
 
 if __name__ == '__main__':
@@ -26,7 +26,13 @@ if __name__ == '__main__':
     parser.add_argument('--before', help='Before date', default='2021-08-25')
     parser.add_argument('--batch', type=int, help='Batch size', default=10)
     parser.add_argument('--output', help='Mailbox to output to.')
+    parser.add_argument('-log', help="Log file")
     args = parser.parse_args()
+
+    if args.log:
+    	handler = logging.FileHandler(args.log)
+    	handler.setLevel(logging.INFO)
+    	logger.addHandler(handler)
 
     mbox_file = args.output or '{}.mbox'.format(args.account_name.split('@')[0])
     accounts = config_parser.load_accounts(args.config)
@@ -37,19 +43,20 @@ if __name__ == '__main__':
     sent_since = pytz.utc.localize(datetime.strptime(args.since, '%Y-%m-%d'))
     account = accounts[args.account_name]
 
-    # Check existing mail box.
-    mbox = mailbox.mbox(args.output)
+    logger.info("Loading existing mail box file.")
+    mbox = mailbox.mbox(mbox_file)
+    logger.info("Found {} messages in file".format(len(mbox)))
     first, last = models.Mbox.get_ranges(mbox)
     logger.info("Mailbox currently contains between %s and %s", first, last)
-    if last > sent_since > first:
+    if first and last and last > sent_since > first:
         logger.info(
-            "Latest email (%s) in mbox is before sent_since (%s), setting "
+            "Latest email (%s) in mbox is after sent_since (%s), setting "
             "sent_since to last (%s)",
             last, sent_since, last)
         sent_since = last
-    if first < sent_before < last:
+    if first and last and first < sent_before < last:
         logger.info(
-            "First email in mbox (%s) is after sent_before (%s). Setting "
+            "First email in mbox (%s) is before sent_before (%s). Setting "
             "sent_before to first (%s)", first, sent_before, first)
         sent_before = first
     if sent_before == first and sent_since == last:
