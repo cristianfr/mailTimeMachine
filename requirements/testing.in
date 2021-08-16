@@ -1,0 +1,5 @@
+-r base.in
+tox
+pytest
+pytest-coverage
+pytest-mock

@@ -8,15 +8,6 @@ import pytz
 import time
 
 
-class ImapMessage:
-
-    def __init__(self, payload):
-        self.content = payload
-
-    def as_store():
-        return self.content[0][1]
-
-
 class Server:
 
     def __init__(self, name=None, host=None, port=None):
@@ -32,6 +23,7 @@ class Account:
         self.login = login
         self.password = password
         self.server = server
+
 
 class Mbox:
 
