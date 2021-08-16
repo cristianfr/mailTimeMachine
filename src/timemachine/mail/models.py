@@ -41,8 +41,11 @@ class Mbox:
         maxy = datetime(1984, 6, 9, tzinfo=pytz.UTC)
         for message in mbox:
             date = utils.parsedate_to_datetime(message['Date'])
-            miny = min(date, miny)
-            maxy = max(date, maxy)
-        if miny > maxy:
-            return None, None
+            try:
+            	miny = min(date, miny)
+            	maxy = max(date, maxy)
+            except TypeError:
+            	date = pytz.utc.localize(date)
+            	miny = min(date, miny)
+            	maxy = max(date, maxy)
         return miny, maxy 

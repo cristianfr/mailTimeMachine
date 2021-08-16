@@ -5,7 +5,7 @@ setup(
    version='0.1.0',
    author='Cristian Figueroa',
    author_email='cristianrfr@gmail.com',
-   package_dir={'': 'src/'},
+   package_dir={'': 'src'},
    packages=['timemachine', 'timemachine.mail'],
    scripts=['src/timemachine/mail/main.py'],
    description='Time Machine For Storing IMAP State',
