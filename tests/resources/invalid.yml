@@ -1,0 +1,10 @@
+---
+servers:
+  test_server:
+    host: some_host
+
+accounts:
+  test_server_2:
+    cristian:
+      login: cristian
+      password: test

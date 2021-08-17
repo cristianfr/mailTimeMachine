@@ -1,0 +1,13 @@
+---
+servers:
+  test_server:
+    host: mail.test.com
+
+accounts:
+  test_server:
+    cristian:
+      login: cristian
+      password: test
+    natally:
+      login: naty
+      password: test
