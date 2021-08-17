@@ -3,6 +3,7 @@ Connection shennanigans
 """
 import imaplib
 import logging
+import email
 import time
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class ImapConnect:
 
     def fetch(self, idx):
         status, data = self.mail.fetch(idx, self.body_format)
-        return data[0][1]
+        return email.message_from_string(data[0][1])
 
     def get_ids_between(self, sent_before, sent_since):
         """
