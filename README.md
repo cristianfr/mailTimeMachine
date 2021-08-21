@@ -1,18 +1,17 @@
 # mailTimeMachine
 
-Time machine features for an IMAP mailbox.
+Base time machine features for an IMAP mailbox.
 
-Built with the purpose of creating an IMAP mbox backup that can be stored in the cloud, allowing the emails to be deleted from IMAP server.
+Built with the purpose of creating an IMAP mbox backup that can be stored in the cloud, allowing the emails to be deleted from IMAP server and restored locally whenever necessary.
+
+So far it can, which is good enough.
 
 # Usage
 
 Populate the config with the imap accounts, then run:
-
-python timemachine.mail.main --since yyyy-mm-dd --before yyyy-mm-dd --output <mbox file> config account
-
-
-# Requirements
-
+```python
+python scripts/backup.py --help
+```
 
 # TODO
 
