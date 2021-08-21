@@ -8,7 +8,7 @@ So far it can, which is good enough.
 
 # Usage
 
-Populate the config with the imap accounts, then run:
+Populate the config with the imap accounts, install the requirements/base.txt, then run:
 ```python
 python scripts/backup.py --help
 ```
